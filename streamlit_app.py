@@ -216,17 +216,39 @@ Ask me any questions you need to fill these in accurately, then write all three.
             st.rerun()
 
 # ========== E – EQUIP ==========
+# ========== E – EQUIP ==========
 elif st.session_state.step == "equip":
     st.header("E – Equip It")
-    st.write("Give the agent the context and tools it needs.")
-    
-    equip = st.text_area(
-        "Context, style guides, tools, and process notes",
-        value=st.session_state.agent_data["equip_notes"],
-        height=200,
-        placeholder="Example: Style guide from last 50 emails, tools allowed (Gmail, calendar), process for sorting emails..."
+    st.write("Give the agent the context, examples, and tools it needs.")
+
+    st.subheader("Upload Reference Files")
+    st.caption("Upload examples of your writing, past emails, process docs, brand voice guides, or guardrail documents.")
+
+    uploaded_files = st.file_uploader(
+        "Upload files (PDF, TXT, MD, DOCX, etc.)",
+        accept_multiple_files=True,
+        type=["txt", "md", "pdf", "docx", "csv"]
     )
-    
+
+    if uploaded_files:
+        st.success(f"{len(uploaded_files)} file(s) uploaded successfully.")
+        file_names = [f.name for f in uploaded_files]
+        st.write("Uploaded files:", ", ".join(file_names))
+
+        # Save file names into session state
+        st.session_state.agent_data["uploaded_files"] = file_names
+    else:
+        st.session_state.agent_data["uploaded_files"] = []
+
+    st.markdown("---")
+
+    equip = st.text_area(
+        "Additional context, style notes, tools, and process instructions",
+        value=st.session_state.agent_data.get("equip_notes", ""),
+        height=200,
+        placeholder="Example: Use a professional but friendly tone. Never make promises about pricing. Always check the calendar before suggesting meeting times..."
+    )
+
     col1, col2 = st.columns([1, 5])
     with col1:
         if st.button("← Back"):
@@ -306,12 +328,14 @@ elif st.session_state.step == "trust":
             st.rerun()
 
 # ========== EXPORT ==========
+# ========== EXPORT ==========
 elif st.session_state.step == "export":
     st.header("Export Your Agent Package")
-    st.success("Your agent is ready. Copy or download the package below.")
-    
+    st.success("Your agent is ready!")
+
     data = st.session_state.agent_data
-    
+
+    # Build markdown
     md = f"""# AI Agent Pilot – Export Package
 **Created:** {datetime.now().strftime("%Y-%m-%d %H:%M")}
 **Framework:** Dan Martell AGENT Method
@@ -343,22 +367,44 @@ elif st.session_state.step == "export":
 ### Specialist {i}: {spec.get('name', 'Unnamed')}
 {spec.get('lane', '')}
 """
-    
+
     md += f"""
 ## 5. Equip / Context & Tools
-{data['equip_notes'] or "_None provided_"}
+{data.get('equip_notes') or "_None provided_"}
+
+**Uploaded Reference Files:** {', '.join(data.get('uploaded_files', [])) or "None"}
 
 ## 6. Trust Stage & Schedule
 - **Current Stage:** {data['trust_stage']}
 - **Schedule:** {data['schedule']}
 - **Guardrails:** {data['guardrails'] or "None"}
 
-## How to Deploy
-1. Copy the identity files and prompts into Claude Projects, Custom GPT, Grok, or your preferred agent platform.
-2. Attach any style guides or example documents.
-3. Start at Trust Stage 1 and increase autonomy only after the agent proves reliable.
+---
+
+## How to Start Your Agent
+
+### Option 1: Claude (Recommended)
+1. Go to [claude.ai](https://claude.ai)
+2. Create a new Project
+3. Upload any reference files you have
+4. Paste the **SOUL + IDENTITY + USER** files into the Project instructions
+5. Paste the Manager prompt as the main system prompt
+6. Create separate chats or projects for each Specialist if needed
+7. Start with Trust Stage 1 (approve everything)
+
+### Option 2: Custom GPT (ChatGPT)
+1. Go to ChatGPT → Create a GPT
+2. Paste the Identity files and Manager prompt into the Instructions
+3. Upload your reference files
+4. Save and start testing
+
+### Option 3: Grok or other platforms
+Copy the prompts into the system prompt / custom instructions area and attach your files.
+
+**Important:**  
+Always start at Trust Stage 1. Only increase autonomy after the agent has proven it follows your style and rules consistently.
 """
-    
+
     st.download_button(
         label="Download Agent Package (.md)",
         data=md,
@@ -366,13 +412,21 @@ elif st.session_state.step == "export":
         mime="text/markdown",
         type="primary"
     )
-    
+
+    st.subheader("Full Package Preview")
     st.code(md, language="markdown")
-    
+
+    st.markdown("---")
+    st.subheader("Next Steps After Export")
+    st.markdown("""
+1. Download the package above  
+2. Choose your platform (Claude Projects is currently the strongest option)  
+3. Paste the identity files and prompts  
+4. Upload your reference documents  
+5. Run real tasks and stay in Trust Stage 1 at the beginning  
+6. Improve the prompts based on what the agent gets wrong
+    """)
+
     if st.button("← Back to Trust"):
         st.session_state.step = "trust"
         st.rerun()
-
-# Footer
-st.divider()
-st.caption("AI Agent Pilot • Built on Dan Martell’s AGENT framework")
