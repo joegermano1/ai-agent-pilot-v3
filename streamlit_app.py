@@ -1,7 +1,3 @@
-Yes — here’s the **full cleaned-up version** of `streamlit_app.py`.
-
-Replace everything in your file with this:
-
 ```python
 import streamlit as st
 from datetime import datetime
