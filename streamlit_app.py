@@ -1,3 +1,8 @@
+Yes — here’s the **full cleaned-up version** of `streamlit_app.py`.
+
+Replace everything in your file with this:
+
+```python
 import streamlit as st
 from datetime import datetime
 import json
@@ -30,7 +35,8 @@ if "agent_data" not in st.session_state:
         "specialists": [],
         "trust_stage": 1,
         "schedule": "Every morning at 9:00 AM",
-        "guardrails": ""
+        "guardrails": "",
+        "uploaded_files": []
     }
 
 if "messages" not in st.session_state:
@@ -63,7 +69,7 @@ Always end your responses by telling the user exactly what to do next.
 """
 
 # -----------------------------
-# Helper: Call AI (OpenAI-compatible)
+# Helper: Call AI
 # -----------------------------
 def call_ai(user_message: str, system: str = SYSTEM_PROMPT) -> str:
     try:
@@ -117,7 +123,8 @@ with st.sidebar:
         st.session_state.agent_data = {
             "aim": "", "dod": "", "soul": "", "identity": "", "user": "",
             "equip_notes": "", "manager_prompt": "", "specialists": [],
-            "trust_stage": 1, "schedule": "Every morning at 9:00 AM", "guardrails": ""
+            "trust_stage": 1, "schedule": "Every morning at 9:00 AM",
+            "guardrails": "", "uploaded_files": []
         }
         st.session_state.messages = []
         st.rerun()
@@ -216,7 +223,6 @@ Ask me any questions you need to fill these in accurately, then write all three.
             st.rerun()
 
 # ========== E – EQUIP ==========
-# ========== E – EQUIP ==========
 elif st.session_state.step == "equip":
     st.header("E – Equip It")
     st.write("Give the agent the context, examples, and tools it needs.")
@@ -234,8 +240,6 @@ elif st.session_state.step == "equip":
         st.success(f"{len(uploaded_files)} file(s) uploaded successfully.")
         file_names = [f.name for f in uploaded_files]
         st.write("Uploaded files:", ", ".join(file_names))
-
-        # Save file names into session state
         st.session_state.agent_data["uploaded_files"] = file_names
     else:
         st.session_state.agent_data["uploaded_files"] = []
@@ -328,14 +332,12 @@ elif st.session_state.step == "trust":
             st.rerun()
 
 # ========== EXPORT ==========
-# ========== EXPORT ==========
 elif st.session_state.step == "export":
     st.header("Export Your Agent Package")
     st.success("Your agent is ready!")
 
     data = st.session_state.agent_data
 
-    # Build markdown
     md = f"""# AI Agent Pilot – Export Package
 **Created:** {datetime.now().strftime("%Y-%m-%d %H:%M")}
 **Framework:** Dan Martell AGENT Method
@@ -430,3 +432,10 @@ Always start at Trust Stage 1. Only increase autonomy after the agent has proven
     if st.button("← Back to Trust"):
         st.session_state.step = "trust"
         st.rerun()
+
+# Footer
+st.divider()
+st.caption("AI Agent Pilot • Built on Dan Martell’s AGENT framework")
+```
+
+Replace your entire `streamlit_app.py` with the code above, commit it, and reboot the app.
