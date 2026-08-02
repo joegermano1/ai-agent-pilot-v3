@@ -1,4 +1,4 @@
-```python
+
 import streamlit as st
 from datetime import datetime
 import json
@@ -432,6 +432,4 @@ Always start at Trust Stage 1. Only increase autonomy after the agent has proven
 # Footer
 st.divider()
 st.caption("AI Agent Pilot • Built on Dan Martell’s AGENT framework")
-```
 
-Replace your entire `streamlit_app.py` with the code above, commit it, and reboot the app.
